@@ -71,16 +71,18 @@
     }
 
     .nav button {
-      flex: 1;
-      padding: 9px 4px;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 9px 2px;
       border: none;
       border-radius: 10px;
       background: var(--card);
       color: var(--muted);
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
+      white-space: nowrap;
     }
 
     .nav button.active {
@@ -666,6 +668,180 @@
       margin-bottom: 16px;
       line-height: 1.45;
     }
+
+    .history-item,
+    .golf-session {
+      overflow-wrap: anywhere;
+    }
+
+    .history-item.golf {
+      border-color: rgba(251, 191, 36, 0.4);
+    }
+
+    .history-item.golf .date,
+    .golf-session .date {
+      color: #fbbf24;
+    }
+
+    #golfNewBtn {
+      margin: 0 0 16px;
+    }
+
+    #golfForm {
+      margin-bottom: 16px;
+    }
+
+    #golfForm h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    #golfForm .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #golfForm .field-input,
+    #golfForm .field-select,
+    #golfForm .field-textarea {
+      font-size: 16px;
+    }
+
+    .field-textarea {
+      width: 100%;
+      min-height: 68px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.4;
+      resize: vertical;
+    }
+
+    input[type="date"].field-input {
+      color-scheme: dark;
+    }
+
+    .split-2 {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 8px;
+    }
+
+    .split-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .tempo-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .chart-caption {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin: -4px 0 10px;
+      line-height: 1.35;
+    }
+
+    .golf-session {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .golf-session .title {
+      font-weight: 650;
+      margin-top: 2px;
+    }
+
+    .golf-session .summary,
+    .session-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .session-note strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .golf-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .golf-actions button {
+      flex: 1;
+      min-height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-weight: 650;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .golf-actions button.danger {
+      color: #fecaca;
+      border-color: rgba(239, 68, 68, 0.55);
+    }
+
+    .section-label {
+      font-size: 0.95rem;
+      font-weight: 650;
+      margin: 4px 0 10px;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .chart-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 14px;
+      height: 3px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .swatch.dashed {
+      height: 0;
+      border-top: 2px dashed #f87171;
+      background: none;
+    }
+
+    .tempo-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -674,6 +850,7 @@
       <h1>Workout Tracker</h1>
       <div class="nav">
         <button data-screen="home" class="active">Days</button>
+        <button data-screen="golf">Golf</button>
         <button data-screen="history">History</button>
         <button data-screen="trends">Trends</button>
         <button data-screen="edit">Edit</button>
@@ -701,6 +878,88 @@
       </div>
     </div>
 
+    <!-- GOLF -->
+    <div id="golf" class="screen">
+      <button type="button" class="log-btn" id="golfNewBtn">Log session</button>
+      <form id="golfForm" class="exercise-card" hidden>
+        <h2 id="golfFormTitle">Log session</h2>
+        <div class="form-fields">
+          <div class="control-group">
+            <label for="golfDate">Date</label>
+            <input id="golfDate" name="date" type="date" class="field-input" required>
+          </div>
+          <div class="split-2">
+            <div class="control-group">
+              <label for="golfType">Session type</label>
+              <select id="golfType" name="type" class="field-select">
+                <option value="">—</option>
+                <option value="net indoor">Net indoor</option>
+                <option value="net outside">Net outside</option>
+                <option value="range">Range</option>
+                <option value="course">Course</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="golfLabel">Detail</label>
+              <input id="golfLabel" name="label" type="text" class="field-input" placeholder="e.g. evening" autocomplete="off">
+            </div>
+          </div>
+          <div class="split-2">
+            <div class="control-group">
+              <label for="golfLength">Length</label>
+              <input id="golfLength" name="length" type="number" inputmode="decimal" min="0" step="any" class="field-input" placeholder="Optional" autocomplete="off">
+            </div>
+            <div class="control-group">
+              <label for="golfLengthUnit">Unit</label>
+              <select id="golfLengthUnit" name="lengthUnit" class="field-select">
+                <option value="swings">Swings</option>
+                <option value="minutes">Minutes</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="golfClubs">Clubs</label>
+            <input id="golfClubs" name="clubs" type="text" class="field-input" placeholder="e.g. iron, driver" autocomplete="off">
+          </div>
+          <div class="control-group">
+            <label for="golfFocus">Focus or drill</label>
+            <textarea id="golfFocus" name="focus" class="field-textarea" placeholder="What you worked on"></textarea>
+          </div>
+          <div class="split-3">
+            <div class="control-group">
+              <label for="golfBack">Back (s)</label>
+              <input id="golfBack" name="backswing" type="number" inputmode="decimal" min="0" step="0.01" class="field-input" placeholder="1.18" autocomplete="off">
+            </div>
+            <div class="control-group">
+              <label for="golfDown">Down (s)</label>
+              <input id="golfDown" name="downswing" type="number" inputmode="decimal" min="0" step="0.01" class="field-input" placeholder="0.39" autocomplete="off">
+            </div>
+            <div class="control-group">
+              <label for="golfTempo">Ratio</label>
+              <input id="golfTempo" name="tempo" type="number" inputmode="decimal" min="0" step="0.1" class="field-input" placeholder="auto" autocomplete="off">
+            </div>
+          </div>
+          <p class="tempo-hint" id="golfTempoHint">Leave ratio blank to calculate backswing ÷ downswing. Target is 3.0.</p>
+          <div class="control-group">
+            <label for="golfWorked">What worked</label>
+            <textarea id="golfWorked" name="worked" class="field-textarea"></textarea>
+          </div>
+          <div class="control-group">
+            <label for="golfDidnt">What didn't</label>
+            <textarea id="golfDidnt" name="didnt" class="field-textarea"></textarea>
+          </div>
+          <div class="control-group">
+            <label for="golfNext">Next time</label>
+            <textarea id="golfNext" name="next" class="field-textarea"></textarea>
+          </div>
+          <button type="submit" class="log-btn" id="golfSaveBtn">Save session</button>
+          <button type="button" class="modal-close" id="golfCancelBtn">Cancel</button>
+        </div>
+      </form>
+      <div id="golfTrend"></div>
+      <div id="golfList"></div>
+    </div>
+
     <!-- HISTORY -->
     <div id="history" class="screen">
       <div class="export-bar">
@@ -708,7 +967,7 @@
         <button id="exportCsv">Download CSV</button>
       </div>
       <div class="info-box">
-        Download a report → open a new Grok chat → paste or attach the file and ask for progress analysis, plateaus, or programming suggestions.
+        Download a report → open a new Grok chat → paste or attach the file and ask for progress analysis, plateaus, or programming suggestions. The JSON report includes gym workouts and golf sessions.
       </div>
       <div id="historyList"></div>
     </div>
@@ -843,6 +1102,71 @@
     let currentSession = null;
     let history = [];
     let charts = {};
+    let golfSessions = [];
+    let golfEditingId = null;
+
+    const GOLF_KEY = 'wt_golf_v1';
+    const GOLF_TYPES = [
+      { value: 'net indoor', label: 'Net indoor' },
+      { value: 'net outside', label: 'Net outside' },
+      { value: 'range', label: 'Range' },
+      { value: 'course', label: 'Course' }
+    ];
+
+    // Seeded only when golf storage has never been written. Workout keys are not read or written here.
+    const GOLF_SEED = [
+      {
+        id: 'golf-seed-1',
+        date: '2026-11-13',
+        type: 'net indoor',
+        label: '',
+        length: 46,
+        lengthUnit: 'swings',
+        clubs: '',
+        focus: 'Garmin tempo training deliberately slow to build rhythm',
+        backswing: 1.18,
+        downswing: 0.46,
+        tempo: 2.6,
+        worked: '',
+        didnt: 'downswing slow',
+        next: 'keep back ~1.1-1.2s, speed up downswing toward 0.39s',
+        createdAt: Date.parse('2026-11-13T10:00:00Z')
+      },
+      {
+        id: 'golf-seed-2',
+        date: '2026-11-13',
+        type: 'net outside',
+        label: '',
+        length: 57,
+        lengthUnit: 'swings',
+        clubs: 'iron',
+        focus: 'Garmin tempo training',
+        backswing: 1.16,
+        downswing: 0.39,
+        tempo: 3,
+        worked: 'tour-standard 3:1 ratio',
+        didnt: '',
+        next: 'repeat then try 3:1 at a quicker pace',
+        createdAt: Date.parse('2026-11-13T16:00:00Z')
+      },
+      {
+        id: 'golf-seed-3',
+        date: '2026-11-14',
+        type: 'net outside',
+        label: 'evening',
+        length: 114,
+        lengthUnit: 'swings',
+        clubs: '',
+        focus: 'Garmin tempo training working through all the speed types',
+        backswing: 0.92,
+        downswing: 0.3,
+        tempo: 3,
+        worked: '3:1 held at quicker pace',
+        didnt: '',
+        next: 'groove the most natural speed; check 3:1 holds with driver as well as irons',
+        createdAt: Date.parse('2026-11-14T18:00:00Z')
+      }
+    ];
 
     // ========== STORAGE ==========
     function load() {
@@ -874,6 +1198,33 @@
       }
     }
 
+    function loadGolf() {
+      let raw;
+      try {
+        raw = localStorage.getItem(GOLF_KEY);
+      } catch (e) {
+        console.warn('Golf load error', e);
+        golfSessions = [];
+        return;
+      }
+      if (raw == null) {
+        golfSessions = GOLF_SEED.map(s => ({ ...s }));
+        saveGolf();
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        golfSessions = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.warn('Golf load error', e);
+        golfSessions = [];
+      }
+    }
+
+    function saveGolf() {
+      localStorage.setItem(GOLF_KEY, JSON.stringify(golfSessions));
+    }
+
     // ========== HELPERS ==========
     function toast(msg) {
       const t = document.getElementById('toast');
@@ -899,6 +1250,78 @@
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function parseOptionalNumber(raw) {
+      const text = String(raw ?? '').trim();
+      if (text === '') return { ok: true, value: null };
+      const n = Number(text);
+      if (!Number.isFinite(n)) return { ok: false, value: null };
+      return { ok: true, value: n };
+    }
+
+    function calcTempoRatio(back, down) {
+      if (back == null || down == null || down === 0) return null;
+      if (!Number.isFinite(back) || !Number.isFinite(down)) return null;
+      return Math.round((back / down) * 10) / 10;
+    }
+
+    function formatTempo(n) {
+      if (n == null || n === '' || !Number.isFinite(Number(n))) return '';
+      return Number(n).toFixed(1);
+    }
+
+    function formatSeconds(n) {
+      if (n == null || n === '' || !Number.isFinite(Number(n))) return '';
+      return Number(n).toFixed(2);
+    }
+
+    function formatGolfLength(session) {
+      if (session.length == null || session.length === '' || !Number.isFinite(Number(session.length))) return '';
+      const n = Number(session.length);
+      const unit = session.lengthUnit === 'minutes'
+        ? (n === 1 ? 'minute' : 'minutes')
+        : (n === 1 ? 'swing' : 'swings');
+      return `${n} ${unit}`;
+    }
+
+    function golfTypeLabel(session) {
+      const match = GOLF_TYPES.find(t => t.value === session.type);
+      const base = match ? match.label : (session.type || 'Session');
+      return session.label ? `${base} (${session.label})` : base;
+    }
+
+    function golfNumbersLine(session) {
+      const parts = [];
+      const len = formatGolfLength(session);
+      if (len) parts.push(len);
+      if (session.clubs) parts.push(session.clubs);
+      if (session.backswing != null && session.backswing !== '') parts.push(`back ${formatSeconds(session.backswing)}s`);
+      if (session.downswing != null && session.downswing !== '') parts.push(`down ${formatSeconds(session.downswing)}s`);
+      if (session.tempo != null && session.tempo !== '') parts.push(`tempo ${formatTempo(session.tempo)}`);
+      return parts.join(' · ');
+    }
+
+    function sortedGolf(list) {
+      return [...(list || golfSessions)].sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
+    }
+
+    function chronologicalGolf(list) {
+      return [...(list || golfSessions)].sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+        return (a.createdAt || 0) - (b.createdAt || 0);
+      });
     }
 
     // ========== RENDER HOME ==========
@@ -1316,7 +1739,8 @@
     // ========== HISTORY ==========
     function renderHistory() {
       const list = document.getElementById('historyList');
-      if (history.length === 0) {
+      const items = combinedActivity();
+      if (items.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
             <div style="font-size:2.5rem;">📋</div>
@@ -1326,11 +1750,26 @@
         return;
       }
 
-      list.innerHTML = history.map(h => {
+      list.innerHTML = items.map(entry => {
+        if (entry.kind === 'golf') {
+          const g = entry.item;
+          const bits = [];
+          const len = formatGolfLength(g);
+          if (len) bits.push(len);
+          if (g.tempo != null && g.tempo !== '') bits.push(`tempo ${formatTempo(g.tempo)}`);
+          return `
+            <div class="history-item golf" data-kind="golf" data-id="${escapeHtml(g.id)}">
+              <div class="date">${formatDate(g.date)} · Golf</div>
+              <div class="title">${escapeHtml(golfTypeLabel(g))}</div>
+              <div class="summary">${escapeHtml(bits.join(' · ') || 'Golf session')}</div>
+            </div>
+          `;
+        }
+        const h = entry.item;
         const totalSets = h.exercises.reduce((sum, e) => sum + e.sets.length, 0);
         const names = h.exercises.slice(0, 3).map(e => e.name).join(', ');
         return `
-          <div class="history-item" data-id="${h.id}">
+          <div class="history-item" data-kind="workout" data-id="${h.id}">
             <div class="date">${formatDate(h.date)} · Day ${h.day}</div>
             <div class="title">${h.dayName}</div>
             <div class="summary">${totalSets} sets · ${names}${h.exercises.length > 3 ? '…' : ''}</div>
@@ -1341,8 +1780,47 @@
       list.onclick = (e) => {
         const item = e.target.closest('.history-item');
         if (!item) return;
+        if (item.dataset.kind === 'golf') {
+          const rec = golfSessions.find(g => g.id === item.dataset.id);
+          if (rec) showGolfHistoryDetail(rec);
+          return;
+        }
         const rec = history.find(h => h.id === item.dataset.id);
         if (rec) showHistoryDetail(rec);
+      };
+    }
+
+    function showGolfHistoryDetail(rec) {
+      const numbers = golfNumbersLine(rec);
+      let html = `<button class="back-btn" id="backHistory">← Back</button>`;
+      html += `<h2 style="margin-bottom:4px;">${escapeHtml(golfTypeLabel(rec))}</h2>`;
+      html += `<div style="color:var(--muted);margin-bottom:16px;">${formatDate(rec.date)} · Golf</div>`;
+      html += `<div class="exercise-card">`;
+      if (numbers) html += `<div class="summary">${escapeHtml(numbers)}</div>`;
+      html += noteLine('Focus', rec.focus);
+      html += noteLine('Worked', rec.worked);
+      html += noteLine("Didn't", rec.didnt);
+      html += noteLine('Next', rec.next);
+      html += `</div>`;
+      html += `<div class="golf-actions">
+        <button type="button" id="editGolfFromHistory">Edit</button>
+        <button type="button" class="danger" id="deleteGolfFromHistory">Delete</button>
+      </div>`;
+
+      document.getElementById('historyList').innerHTML = html;
+      document.getElementById('backHistory').onclick = () => renderHistory();
+      document.getElementById('editGolfFromHistory').onclick = () => {
+        showScreen('golf');
+        startEditGolf(rec.id);
+      };
+      document.getElementById('deleteGolfFromHistory').onclick = () => {
+        if (confirm('Delete this golf session?')) {
+          golfSessions = golfSessions.filter(g => g.id !== rec.id);
+          saveGolf();
+          if (golfEditingId === rec.id) closeGolfForm();
+          renderHistory();
+          toast('Deleted');
+        }
       };
     }
 
@@ -1398,7 +1876,7 @@
 
     // ========== EXPORT ==========
     function exportJSON() {
-      if (history.length === 0) {
+      if (history.length === 0 && golfSessions.length === 0) {
         toast('No data to export');
         return;
       }
@@ -1406,17 +1884,24 @@
         exportedAt: new Date().toISOString(),
         app: "Workout Tracker",
         totalWorkouts: history.length,
-        workouts: history
+        workouts: history,
+        totalGolfSessions: golfSessions.length,
+        golfSessions: sortedGolf()
       };
       downloadFile(`workout-report-${todayStr()}.json`, JSON.stringify(report, null, 2), 'application/json');
       toast('JSON downloaded');
     }
 
+    function csvEscape(value) {
+      return `"${String(value ?? '').replace(/"/g, '""')}"`;
+    }
+
     function exportCSV() {
-      if (history.length === 0) {
+      if (history.length === 0 && golfSessions.length === 0) {
         toast('No data to export');
         return;
       }
+      const parts = [];
       const rows = [['Date', 'Day', 'Day Name', 'Exercise', 'Type', 'Set', 'Weight_kg', 'Reps', 'Duration_min', 'CardioType', 'AvgHR', 'MaxHR', 'Distance_km', 'Calories', 'Notes']];
       history.forEach(h => {
         h.exercises.forEach(ex => {
@@ -1441,15 +1926,43 @@
           });
         });
       });
-      const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
-      downloadFile(`workout-report-${todayStr()}.csv`, csv, 'text/csv');
+      if (history.length > 0) {
+        parts.push(rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n'));
+      }
+
+      if (golfSessions.length > 0) {
+        const golfRows = [[
+          'Date', 'SessionType', 'Label', 'Length', 'LengthUnit', 'Clubs', 'Focus',
+          'Backswing_s', 'Downswing_s', 'TempoRatio', 'Worked', 'Didnt', 'Next'
+        ]];
+        sortedGolf().forEach(s => {
+          golfRows.push([
+            s.date,
+            s.type || '',
+            s.label || '',
+            s.length ?? '',
+            s.length == null ? '' : (s.lengthUnit || ''),
+            s.clubs || '',
+            s.focus || '',
+            s.backswing ?? '',
+            s.downswing ?? '',
+            s.tempo ?? '',
+            s.worked || '',
+            s.didnt || '',
+            s.next || ''
+          ]);
+        });
+        parts.push(golfRows.map(r => r.map(csvEscape).join(',')).join('\n'));
+      }
+
+      downloadFile(`workout-report-${todayStr()}.csv`, parts.join('\n\n'), 'text/csv');
       toast('CSV downloaded');
     }
 
     // ========== TRENDS ==========
     function renderTrends() {
       const container = document.getElementById('trendsContent');
-      if (history.length === 0) {
+      if (history.length === 0 && golfSessions.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <div style="font-size:2.5rem;">📈</div>
@@ -1462,37 +1975,47 @@
       // Compute stats
       let totalVolume = 0; // kg*reps
       let totalCardioMin = 0;
-      let totalSets = 0;
       let hrSamples = [];
       const byWeek = {};
 
+      function weekBucket(week) {
+        if (!byWeek[week]) byWeek[week] = { volume: 0, cardio: 0, workouts: 0, golf: 0 };
+        return byWeek[week];
+      }
+
       history.forEach(h => {
-        const week = getWeekKey(h.date);
-        if (!byWeek[week]) byWeek[week] = { volume: 0, cardio: 0, workouts: 0 };
-        byWeek[week].workouts += 1;
+        const bucket = weekBucket(getWeekKey(h.date));
+        bucket.workouts += 1;
 
         h.exercises.forEach(ex => {
           ex.sets.forEach(s => {
-            totalSets += 1;
             if (ex.type === 'strength' && s.weight && s.reps) {
               const vol = s.weight * s.reps;
               totalVolume += vol;
-              byWeek[week].volume += vol;
+              bucket.volume += vol;
             }
             if (ex.type === 'cardio' && s.duration) {
               totalCardioMin += s.duration;
-              byWeek[week].cardio += s.duration;
+              bucket.cardio += s.duration;
               if (s.avgHR) hrSamples.push(s.avgHR);
             }
           });
         });
       });
 
+      golfSessions.forEach(g => {
+        if (!g.date) return;
+        weekBucket(getWeekKey(g.date)).golf += 1;
+      });
+
       const avgHR = hrSamples.length ? Math.round(hrSamples.reduce((a,b)=>a+b,0) / hrSamples.length) : null;
       const weeks = Object.keys(byWeek).sort();
+      const chartScale = {
+        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+        y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+      };
 
-      container.innerHTML = `
-        <div class="stat-grid">
+      const gymStats = history.length === 0 ? '' : `
           <div class="stat-card">
             <div class="label">Workouts</div>
             <div class="value">${history.length}</div>
@@ -1513,8 +2036,24 @@
             <div class="value">${avgHR || '—'}</div>
             <div class="sub">${hrSamples.length} sessions</div>
           </div>
+      `;
+
+      container.innerHTML = `
+        <div class="stat-grid">
+          ${gymStats}
+          <div class="stat-card">
+            <div class="label">Golf sessions</div>
+            <div class="value">${golfSessions.length}</div>
+            <div class="sub">on this phone</div>
+          </div>
         </div>
 
+        <div class="chart-wrap">
+          <h3>Weekly sessions</h3>
+          <div class="chart-container"><canvas id="weekChart"></canvas></div>
+        </div>
+
+        ${history.length === 0 ? '' : `
         <div class="chart-wrap">
           <h3>Weekly Strength Volume</h3>
           <div class="chart-container"><canvas id="volChart"></canvas></div>
@@ -1524,24 +2063,58 @@
           <h3>Weekly Cardio Minutes</h3>
           <div class="chart-container"><canvas id="cardioChart"></canvas></div>
         </div>
+        `}
 
         <div class="info-box">
-          For deeper analysis: go to History → Download JSON Report → start a new Grok chat and paste the data. Ask things like “Where am I plateauing?” or “Suggest progressive overload for next 4 weeks”.
+          For deeper analysis: go to History → Download JSON Report → start a new Grok chat and paste the data. The file includes gym workouts and golf sessions.
         </div>
       `;
 
       // Charts
       destroyCharts();
-      const volData = weeks.map(w => Math.round(byWeek[w].volume));
-      const cardioData = weeks.map(w => byWeek[w].cardio);
+      const labels = weeks.map(w => w.slice(5));
+
+      charts.weekly = new Chart(document.getElementById('weekChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Workouts',
+              data: weeks.map(w => byWeek[w].workouts),
+              backgroundColor: 'rgba(34, 197, 94, 0.75)',
+              borderRadius: 6
+            },
+            {
+              label: 'Golf',
+              data: weeks.map(w => byWeek[w].golf),
+              backgroundColor: 'rgba(251, 191, 36, 0.85)',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } } }
+          },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+            y: { beginAtZero: true, ticks: { color: '#94a3b8', precision: 0 }, grid: { color: '#334155' } }
+          }
+        }
+      });
+
+      if (history.length === 0) return;
 
       charts.vol = new Chart(document.getElementById('volChart'), {
         type: 'bar',
         data: {
-          labels: weeks.map(w => w.slice(5)), // short label
+          labels,
           datasets: [{
             label: 'Volume (kg×reps)',
-            data: volData,
+            data: weeks.map(w => Math.round(byWeek[w].volume)),
             backgroundColor: 'rgba(34, 197, 94, 0.7)',
             borderRadius: 6
           }]
@@ -1550,20 +2123,17 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
-          }
+          scales: chartScale
         }
       });
 
       charts.cardio = new Chart(document.getElementById('cardioChart'), {
         type: 'line',
         data: {
-          labels: weeks.map(w => w.slice(5)),
+          labels,
           datasets: [{
             label: 'Minutes',
-            data: cardioData,
+            data: weeks.map(w => byWeek[w].cardio),
             borderColor: '#38bdf8',
             backgroundColor: 'rgba(56, 189, 248, 0.15)',
             fill: true,
@@ -1574,10 +2144,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
-          }
+          scales: chartScale
         }
       });
     }
@@ -1639,6 +2206,339 @@
       renderHome();
     }
 
+    // ========== GOLF ==========
+    function golfField(id) {
+      return document.getElementById(id);
+    }
+
+    function updateTempoHint() {
+      const hint = golfField('golfTempoHint');
+      const back = parseOptionalNumber(golfField('golfBack').value);
+      const down = parseOptionalNumber(golfField('golfDown').value);
+      const tempoRaw = golfField('golfTempo').value.trim();
+      const ratio = back.ok && down.ok ? calcTempoRatio(back.value, down.value) : null;
+      golfField('golfTempo').placeholder = ratio == null ? 'auto' : ratio.toFixed(1);
+
+      if (tempoRaw !== '') {
+        hint.textContent = 'Ratio left as entered. Clear it to calculate backswing ÷ downswing.';
+        return;
+      }
+      if (back.ok && down.ok && down.value === 0) {
+        hint.textContent = 'Downswing must be above 0 to calculate the ratio.';
+        return;
+      }
+      if (ratio != null) {
+        hint.textContent = `Will save ratio ${ratio.toFixed(1)} (backswing ÷ downswing). Target is 3.0.`;
+        return;
+      }
+      hint.textContent = 'Leave ratio blank to calculate backswing ÷ downswing. Target is 3.0.';
+    }
+
+    function closeGolfForm() {
+      golfEditingId = null;
+      const form = golfField('golfForm');
+      form.reset();
+      form.hidden = true;
+      golfField('golfNewBtn').hidden = false;
+      golfField('golfLengthUnit').value = 'swings';
+      golfField('golfDate').value = todayStr();
+      golfField('golfFormTitle').textContent = 'Log session';
+      golfField('golfSaveBtn').textContent = 'Save session';
+      updateTempoHint();
+    }
+
+    function openNewGolfForm() {
+      closeGolfForm();
+      golfField('golfForm').hidden = false;
+      golfField('golfNewBtn').hidden = true;
+      golfField('golfDate').value = todayStr();
+      golfField('golfForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function startEditGolf(id) {
+      const session = golfSessions.find(s => s.id === id);
+      if (!session) return;
+      golfEditingId = id;
+      golfField('golfForm').hidden = false;
+      golfField('golfNewBtn').hidden = true;
+      golfField('golfFormTitle').textContent = 'Edit session';
+      golfField('golfSaveBtn').textContent = 'Update session';
+      golfField('golfDate').value = session.date || '';
+      golfField('golfType').value = GOLF_TYPES.some(t => t.value === session.type) ? session.type : '';
+      golfField('golfLabel').value = session.label || '';
+      golfField('golfLength').value = session.length == null ? '' : session.length;
+      golfField('golfLengthUnit').value = session.lengthUnit === 'minutes' ? 'minutes' : 'swings';
+      golfField('golfClubs').value = session.clubs || '';
+      golfField('golfFocus').value = session.focus || '';
+      golfField('golfBack').value = session.backswing == null ? '' : session.backswing;
+      golfField('golfDown').value = session.downswing == null ? '' : session.downswing;
+      golfField('golfTempo').value = session.tempo == null ? '' : session.tempo;
+      golfField('golfWorked').value = session.worked || '';
+      golfField('golfDidnt').value = session.didnt || '';
+      golfField('golfNext').value = session.next || '';
+      updateTempoHint();
+      golfField('golfForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function readGolfNumber(id, label, { positive = false } = {}) {
+      const parsed = parseOptionalNumber(golfField(id).value);
+      if (!parsed.ok) {
+        toast(`${label} must be a number`);
+        return { ok: false, value: null };
+      }
+      if (parsed.value != null && parsed.value < 0) {
+        toast(`${label} can't be negative`);
+        return { ok: false, value: null };
+      }
+      if (positive && parsed.value != null && parsed.value <= 0) {
+        toast(`${label} should be greater than 0`);
+        return { ok: false, value: null };
+      }
+      return parsed;
+    }
+
+    function saveGolfFromForm(e) {
+      e.preventDefault();
+      const date = golfField('golfDate').value;
+      if (!date) {
+        toast('Date is required');
+        return;
+      }
+
+      const length = readGolfNumber('golfLength', 'Length', { positive: true });
+      if (!length.ok) return;
+      const back = readGolfNumber('golfBack', 'Backswing');
+      if (!back.ok) return;
+      const down = readGolfNumber('golfDown', 'Downswing');
+      if (!down.ok) return;
+      const tempoInput = readGolfNumber('golfTempo', 'Ratio');
+      if (!tempoInput.ok) return;
+
+      let tempo = tempoInput.value;
+      if (tempo == null) tempo = calcTempoRatio(back.value, down.value);
+
+      const existing = golfEditingId ? golfSessions.find(s => s.id === golfEditingId) : null;
+      const session = {
+        id: existing ? existing.id : Date.now().toString(),
+        date,
+        type: golfField('golfType').value,
+        label: golfField('golfLabel').value.trim(),
+        length: length.value,
+        lengthUnit: golfField('golfLengthUnit').value === 'minutes' ? 'minutes' : 'swings',
+        clubs: golfField('golfClubs').value.trim(),
+        focus: golfField('golfFocus').value.trim(),
+        backswing: back.value,
+        downswing: down.value,
+        tempo,
+        worked: golfField('golfWorked').value.trim(),
+        didnt: golfField('golfDidnt').value.trim(),
+        next: golfField('golfNext').value.trim(),
+        createdAt: existing ? existing.createdAt : Date.now()
+      };
+
+      if (existing) {
+        const idx = golfSessions.findIndex(s => s.id === existing.id);
+        golfSessions[idx] = session;
+      } else {
+        golfSessions.push(session);
+      }
+      saveGolf();
+      closeGolfForm();
+      renderGolf();
+      toast(existing ? 'Session updated' : 'Session saved');
+    }
+
+    function deleteGolfSession(id) {
+      if (!confirm('Delete this golf session?')) return;
+      golfSessions = golfSessions.filter(s => s.id !== id);
+      saveGolf();
+      if (golfEditingId === id) closeGolfForm();
+      renderGolf();
+      toast('Deleted');
+    }
+
+    function renderTempoTrend() {
+      const host = golfField('golfTrend');
+      const points = chronologicalGolf().filter(s =>
+        (s.backswing != null && s.backswing !== '') ||
+        (s.downswing != null && s.downswing !== '') ||
+        (s.tempo != null && s.tempo !== '')
+      );
+
+      if (points.length === 0) {
+        host.innerHTML = `
+          <div class="chart-wrap">
+            <h3>Tempo trend</h3>
+            <div class="empty-state" style="padding:28px 12px;">
+              <p>Log backswing and downswing to see the trend. The dashed line marks a 3.0 ratio.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const w = 340;
+      const padL = 36;
+      const padR = 12;
+      const panelH = 78;
+      const gap = 22;
+      const top1 = 16;
+      const top2 = top1 + panelH + gap;
+      const h = top2 + panelH + 28;
+      const innerW = w - padL - padR;
+
+      const seconds = points.flatMap(p => [p.backswing, p.downswing])
+        .map(Number)
+        .filter(n => Number.isFinite(n) && n >= 0);
+      const ratios = points.map(p => Number(p.tempo)).filter(n => Number.isFinite(n));
+      const secMax = Math.max(0.2, (seconds.length ? Math.max(...seconds) : 1) * 1.2);
+      const ratioDataMin = Math.min(...(ratios.length ? ratios : [3]), 3);
+      const ratioDataMax = Math.max(...(ratios.length ? ratios : [3]), 3);
+      const ratioSpan = Math.max(0.8, ratioDataMax - ratioDataMin);
+      const ratioMin = Math.max(0, ratioDataMin - ratioSpan * 0.45);
+      const ratioMax = ratioDataMax + ratioSpan * 0.45;
+
+      const xAt = (i) => {
+        if (points.length === 1) return padL + innerW / 2;
+        return padL + (innerW * i) / (points.length - 1);
+      };
+      const ySec = (v) => top1 + panelH - (v / secMax) * panelH;
+      const yRatio = (v) => top2 + panelH - ((v - ratioMin) / (ratioMax - ratioMin)) * panelH;
+
+      const seriesPath = (key, yFn) => {
+        let d = '';
+        let drawing = false;
+        points.forEach((p, i) => {
+          const n = Number(p[key]);
+          if (!Number.isFinite(n)) {
+            drawing = false;
+            return;
+          }
+          d += `${drawing ? 'L' : 'M'}${xAt(i).toFixed(1)},${yFn(n).toFixed(1)}`;
+          drawing = true;
+        });
+        return d;
+      };
+
+      const dots = (key, yFn, color) => points.map((p, i) => {
+        const n = Number(p[key]);
+        if (!Number.isFinite(n)) return '';
+        return `<circle cx="${xAt(i).toFixed(1)}" cy="${yFn(n).toFixed(1)}" r="3.5" fill="${color}"></circle>`;
+      }).join('');
+
+      const gridFor = (top, min, max) => {
+        const lines = [];
+        for (let i = 0; i <= 2; i++) {
+          const y = top + (panelH * i) / 2;
+          const value = max - ((max - min) * i) / 2;
+          lines.push(`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}" stroke="#334155" stroke-width="1"></line>`);
+          lines.push(`<text x="${padL - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" fill="#94a3b8" font-size="10">${value.toFixed(1)}</text>`);
+        }
+        return lines.join('');
+      };
+
+      const labelStep = Math.ceil(points.length / 6);
+      const xLabels = points.map((p, i) => {
+        if (i % labelStep !== 0 && i !== points.length - 1) return '';
+        const anchor = points.length === 1 ? 'middle' : (i === 0 ? 'start' : (i === points.length - 1 ? 'end' : 'middle'));
+        const d = new Date(p.date + 'T12:00:00');
+        const label = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        return `<text x="${xAt(i).toFixed(1)}" y="${h - 8}" text-anchor="${anchor}" fill="#94a3b8" font-size="10">${label}</text>`;
+      }).join('');
+
+      const targetY = yRatio(3);
+      const backPath = seriesPath('backswing', ySec);
+      const downPath = seriesPath('downswing', ySec);
+      const ratioPath = seriesPath('tempo', yRatio);
+
+      host.innerHTML = `
+        <div class="chart-wrap">
+          <h3>Tempo trend</h3>
+          <p class="chart-caption">Top is backswing and downswing in seconds. Bottom is the ratio. The dashed line is the 3.0 target.</p>
+          <svg class="tempo-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Tempo trend. Top: backswing and downswing in seconds. Bottom: tempo ratio, with a dashed line at the 3.0 target.">
+            ${gridFor(top1, 0, secMax)}
+            ${gridFor(top2, ratioMin, ratioMax)}
+            <line x1="${padL}" y1="${targetY.toFixed(1)}" x2="${w - padR}" y2="${targetY.toFixed(1)}" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4 3"></line>
+            ${backPath ? `<path d="${backPath}" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>` : ''}
+            ${downPath ? `<path d="${downPath}" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>` : ''}
+            ${ratioPath ? `<path d="${ratioPath}" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>` : ''}
+            ${dots('backswing', ySec, '#22c55e')}
+            ${dots('downswing', ySec, '#38bdf8')}
+            ${dots('tempo', yRatio, '#fbbf24')}
+            ${xLabels}
+          </svg>
+          <div class="chart-legend">
+            <span><i class="swatch" style="background:#22c55e"></i>Backswing (s)</span>
+            <span><i class="swatch" style="background:#38bdf8"></i>Downswing (s)</span>
+            <span><i class="swatch" style="background:#fbbf24"></i>Ratio</span>
+            <span><i class="swatch dashed"></i>3.0 target</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function noteLine(label, value) {
+      if (!value) return '';
+      return `<div class="session-note"><strong>${label}:</strong> ${escapeHtml(value)}</div>`;
+    }
+
+    function renderGolfList() {
+      const host = golfField('golfList');
+      const sessions = sortedGolf();
+      if (sessions.length === 0) {
+        host.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size:2.5rem;">⛳</div>
+            <p>No golf sessions yet.</p>
+          </div>
+        `;
+        return;
+      }
+
+      host.innerHTML = `<h3 class="section-label">Sessions</h3>` + sessions.map(s => {
+        const numbers = golfNumbersLine(s);
+        return `
+          <article class="golf-session" data-id="${escapeHtml(s.id)}">
+            <div class="date">${formatDate(s.date)}</div>
+            <div class="title">${escapeHtml(golfTypeLabel(s))}</div>
+            ${numbers ? `<div class="summary">${escapeHtml(numbers)}</div>` : ''}
+            ${noteLine('Focus', s.focus)}
+            ${noteLine('Worked', s.worked)}
+            ${noteLine("Didn't", s.didnt)}
+            ${noteLine('Next', s.next)}
+            <div class="golf-actions">
+              <button type="button" data-golf-action="edit" data-id="${escapeHtml(s.id)}">Edit</button>
+              <button type="button" class="danger" data-golf-action="delete" data-id="${escapeHtml(s.id)}">Delete</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderGolf() {
+      renderTempoTrend();
+      renderGolfList();
+    }
+
+    function combinedActivity() {
+      const workouts = history.map(item => ({
+        kind: 'workout',
+        date: item.date || '',
+        ts: Number(item.id) || 0,
+        item
+      }));
+      const golf = golfSessions.map(item => ({
+        kind: 'golf',
+        date: item.date || '',
+        ts: item.createdAt || 0,
+        item
+      }));
+      return [...workouts, ...golf].sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        return b.ts - a.ts;
+      });
+    }
+
     // ========== NAV ==========
     function showScreen(name) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1648,6 +2548,7 @@
       });
 
       if (name === 'home') renderHome();
+      if (name === 'golf') renderGolf();
       if (name === 'history') renderHistory();
       if (name === 'trends') renderTrends();
       if (name === 'edit') renderEdit();
@@ -1664,12 +2565,26 @@
     document.getElementById('savePlanBtn').onclick = savePlanChanges;
     document.getElementById('exportJson').onclick = exportJSON;
     document.getElementById('exportCsv').onclick = exportCSV;
+    document.getElementById('golfNewBtn').onclick = openNewGolfForm;
+    document.getElementById('golfCancelBtn').onclick = closeGolfForm;
+    document.getElementById('golfForm').onsubmit = saveGolfFromForm;
+    ['golfBack', 'golfDown', 'golfTempo'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateTempoHint);
+    });
+    document.getElementById('golfList').onclick = (e) => {
+      const btn = e.target.closest('button[data-golf-action]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (btn.dataset.golfAction === 'edit') startEditGolf(id);
+      if (btn.dataset.golfAction === 'delete') deleteGolfSession(id);
+    };
 
     document.getElementById('altModal').onclick = (e) => {
       if (e.target.id === 'altModal') closeAltModal();
     };
 
     load();
+    loadGolf();
     renderHome();
   </script>
 </body>
